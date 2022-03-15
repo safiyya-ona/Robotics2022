@@ -51,6 +51,10 @@ double z;
 double L1 = 9.5;
 double L2 = 18;
 
+int Joint1AnglePrev = 90;
+int Joint2AnglePrev = 90;
+int Joint3AnglePrev = 90;
+
 
 void setup() {
   Serial.begin(9600);
@@ -115,9 +119,7 @@ void loop() {
   
   delay(10);
 
-
 }
-
 
 int getTheta1(double x, double y, double z){
   int theta1 = (atan2(y,x))*(180/PI);
