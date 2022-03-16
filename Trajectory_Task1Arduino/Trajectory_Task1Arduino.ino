@@ -32,8 +32,8 @@ int Joint1Angle = 90;
 int Joint2Angle = 90;
 int Joint3Angle = 90;
 int Joint4Angle = 180;
-int GripperOpen = 15; // Open gripper; Need to tune value
-int GripperClose = 120; // Close gripper; Need to tune value
+int GripperOpen = 80; // Open gripper; Need to tune value
+int GripperClose = 170; // Close gripper; Need to tune value
 
 // Joint Angle Offsets
 int Joint1Offset = 15; // Your value may be different

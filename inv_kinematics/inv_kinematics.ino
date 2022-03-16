@@ -16,16 +16,19 @@ int Joint1Angle = 90;
 int Joint2Angle = 90;
 int Joint3Angle = 90;
 int Joint4Angle = 180;
-int GripperOpen = 15; // Open gripper;
-int GripperClose = 120; // Close gripper; 
+int GripperOpen = 80; // Open gripper;
+int GripperClose = 170; // Close gripper; 
 // Joint Angle Offsets
 int Joint1Offset = 15; 
 int Joint2Offset = 39; 
 int Joint3Offset = 0; 
 int Joint4Offset = -90;
+// Previous angles stored so robot does not stretch out
+int Joint1AnglePrev = 90;
+int Joint2AnglePrev = 90;
+int Joint3AnglePrev = 90;
 
-
-// cartesian coordinates for x, y and z
+// Cartesian coordinates for x, y and z
 
 // the positve direction for x is left - to go right, change to negative sign
 int x = -10;
@@ -79,37 +82,50 @@ void loop() {
 
 int getTheta1(double x, double y, double z){
   int theta1 = (atan2(y,x))*(180/PI);
-  return theta1;
+  if (!isValidAngle(theta1))
+  {
+    return Joint1AnglePrev;
+  } else {
+    Joint1AnglePrev = theta1;
+    return theta1;
+  }  
 }
 
 int getTheta2(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));
   double w = sqrt(pow(r,2)+pow(z,2));
-  float A = pow(L1,2)+pow(r,2)+pow(z,2)-pow(L2,2);
-  float B = 2*L1*w;
-  int theta2 = -(atan2(z,r)-acos(A/B))*(180/PI);
-
-  // Serial.print("r: ");
-  // Serial.print(r);
-  // Serial.print(" w: ");
-  // Serial.print(w);
-  // Serial.print(" A: ");
-  // Serial.print(A);
-  // Serial.print(" B: ");
-  // Serial.println(B);
-  return theta2;
+  double A = pow(L1,2)+pow(r,2)+pow(z,2)-pow(L2,2);
+  double B = 2*L1*w;
+  if (!isValidAngle(atan2(z,r)) || !isValidAngle(acos(A/B)))
+  {
+    return Joint2AnglePrev;
+  } else {
+    int theta2 = -(atan2(z,r)-acos(A/B))*(180/PI);
+    Joint2AnglePrev = theta2;
+    return theta2;
+  }
 }
 
 int getTheta3(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));  
-  float C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
-  float D = 2*L1*L2;
-  int theta3 = (acos(C/D)*(180/PI));
-  // Serial.print("r: ");
-  // Serial.print(r);
-  // Serial.print(" C: ");
-  // Serial.print(C);
-  // Serial.print(" D: ");
-  // Serial.println(D);
-  return theta3;
+  double C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
+  double D = 2*L1*L2;
+  if (!isValidAngle((acos(C/D)))){
+    return Joint3AnglePrev;
+  }
+  else {
+    int theta3 = (acos(C/D)*(180/PI));
+    Joint3AnglePrev = theta3;
+    return theta3;
+  }
+}
+
+bool isValidAngle(double angle){
+  if (isnan(angle) || isinf(angle))
+  {
+    return false;
+  }
+  else {
+    return true;
+  }
 }

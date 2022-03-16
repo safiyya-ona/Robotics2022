@@ -5,6 +5,9 @@
 #define Joint3Pin 4
 #define Joint4Pin 10
 #define GripperPin 11
+#define L1 9.5
+#define L2 18.0
+#define FinalTime 5.0
 
 // Control pins
 int Joint1ControlPin = A1;
@@ -38,22 +41,22 @@ int Joint2Offset = 39; // Your value may be different
 int Joint3Offset = 0; // Your value may be different
 int Joint4Offset = -90; // Your value may be different
 
-// cartesian coordinates for x, y and z
-
 // the positve direction for x is left - to go right, change to negative sign
-double x;
+double startX, currentX = 0.0;
 
-double y;
+double startY, currentY = 18.0;
 
 // the postive direction for z is down - to go up, change to negative sign
-double z;
+double startZ, currentZ = -9.5;
 
-double L1 = 9.5;
-double L2 = 18;
+double startingPosition[3] = {0.0, 18.0, -9.5};
+double objectInit[3] = {10.0,10.0,5.0};
+double objectTarget[3] = {-10.0,10.0,5.0};
 
 int Joint1AnglePrev = 90;
 int Joint2AnglePrev = 90;
 int Joint3AnglePrev = 90;
+
 
 
 void setup() {
@@ -74,51 +77,19 @@ void setup() {
 }
 
 void loop() {
- 
-  Joint4.write(Joint4Angle+Joint4Offset);
-
-
-  // Read Potentiometer Values
-  Joint1Control = analogRead(Joint1ControlPin);
-  Joint2Control = analogRead(Joint2ControlPin);
-  Joint3Control = analogRead(Joint3ControlPin);
-  
-  // Map Analog-Digital-Converted Values into distance
-  x = map(Joint1Control,0,1023,20.0,-20.0);
-  y = map(Joint2Control,0,1023,0.0,20.0);
-  z = map(Joint3Control,0,1023,0,-20);
-
-  // Calculate angles
-
-  Joint1Angle = getTheta1(x,y,z); 
-  Joint2Angle = getTheta2(x,y,z); 
-  Joint3Angle = getTheta3(x,y,z); 
-
-
-  Serial.print("Joint 1: ");
-  Serial.print(Joint1Angle);
-  Serial.print(", Joint 2: ");
-  Serial.print(Joint2Angle);
-  Serial.print(", Joint 3: ");
-  Serial.print(Joint3Angle);
-
-  Serial.print(" .     X: ");
-  Serial.print(x);
-  Serial.print(" Y: ");
-  Serial.print(y);
-  Serial.print(" Z: ");
-  Serial.println(z);
-
-
-  
-  Joint1.write(Joint1Angle+Joint1Offset);
-  Joint2.write(Joint2Angle+Joint2Offset);
-  Joint3.write(Joint3Angle+Joint3Offset);
-  Joint4.write(Joint4Angle+Joint4Offset);
-
-  
-  delay(10);
-
+  doGripper(GripperOpen);
+  // go to object
+  moveTo(objectInit);
+  // grab the object
+  doGripper(GripperClose);
+  Serial.println("back to start");
+  // move to start position
+  moveTo(startingPosition);
+  // place object
+  moveTo(objectTarget);
+  doGripper(GripperOpen);
+  delay(10000);
+  moveTo(startingPosition);
 }
 
 int getTheta1(double x, double y, double z){
@@ -149,8 +120,8 @@ int getTheta2(double x, double y, double z){
 
 int getTheta3(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));  
-  float C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
-  float D = 2*L1*L2;
+  double C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
+  double D = 2*L1*L2;
   if (!isValidAngle((acos(C/D)))){
     return Joint3AnglePrev;
   }
@@ -169,4 +140,60 @@ bool isValidAngle(double angle){
   else {
     return true;
   }
+}
+
+double getTrajectoryatT(double initial, double finalPos, double t){
+  if (t >= FinalTime)
+  {
+    return finalPos;
+  }
+  return initial + (3.0/pow(FinalTime,2) * (finalPos - initial) * pow(t,2)) - (2.0/pow(FinalTime,3) * (finalPos-initial) * pow(t,3));
+}
+
+void moveToPosition(double x, double y, double z){
+  // this takes the Cartesian Coordinates from the trajectory and uses inverse kinematics to get to the respective position
+  Joint1Angle = getTheta1(x,y,z); 
+  Joint2Angle = getTheta2(x,y,z); 
+  Joint3Angle = getTheta3(x,y,z); 
+
+
+  Serial.print("Joint 1: ");
+  Serial.print(Joint1Angle);
+  Serial.print(", Joint 2: ");
+  Serial.print(Joint2Angle);
+  Serial.print(", Joint 3: ");
+  Serial.print(Joint3Angle);
+
+  Serial.print("     X: ");
+  Serial.print(x);
+  Serial.print(" Y: ");
+  Serial.print(y);
+  Serial.print(" Z: ");
+  Serial.println(z);
+
+  Joint1.write(Joint1Angle+Joint1Offset);
+  Joint2.write(Joint2Angle+Joint2Offset);
+  Joint3.write(Joint3Angle+Joint3Offset);
+  Joint4.write(Joint4Angle+Joint4Offset);
+  delay(100);
+}
+
+void doGripper(int angle){
+  Gripper.write(angle+Joint4Offset);
+}
+
+void moveTo( double endingPos[3]){
+  double x,y,z;
+
+  for (double i = 0; i < FinalTime; i = i + 0.1)
+  {
+    x = getTrajectoryatT(currentX, endingPos[0], i);
+    y = getTrajectoryatT(currentY, endingPos[1], i);
+    z = getTrajectoryatT(currentZ, endingPos[2], i);
+    moveToPosition(x,y,z);
+  }
+
+  currentX = endingPos[0];
+  currentY = endingPos[1];
+  currentZ = endingPos[2];
 }
