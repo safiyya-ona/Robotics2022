@@ -45,7 +45,7 @@ void setup() {
   Joint3.attach(Joint3Pin);
   Joint4.attach(Joint4Pin);
   
-   Joint1.write(Joint1Angle+Joint1Offset);
+  Joint1.write(Joint1Angle+Joint1Offset);
   Joint2.write(Joint2Angle+Joint2Offset);
   Joint3.write(Joint3Angle+Joint3Offset);
   Gripper.attach(GripperPin);
@@ -89,14 +89,14 @@ int getTheta2(double x, double y, double z){
   float B = 2*L1*w;
   int theta2 = -(atan2(z,r)-acos(A/B))*(180/PI);
 
-  Serial.print("r: ");
-  Serial.print(r);
-  Serial.print(" w: ");
-  Serial.print(w);
-  Serial.print(" A: ");
-  Serial.print(A);
-  Serial.print(" B: ");
-  Serial.println(B);
+  // Serial.print("r: ");
+  // Serial.print(r);
+  // Serial.print(" w: ");
+  // Serial.print(w);
+  // Serial.print(" A: ");
+  // Serial.print(A);
+  // Serial.print(" B: ");
+  // Serial.println(B);
   return theta2;
 }
 
@@ -105,12 +105,12 @@ int getTheta3(double x, double y, double z){
   float C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
   float D = 2*L1*L2;
   int theta3 = (acos(C/D)*(180/PI));
-  Serial.print("r: ");
-  Serial.print(r);
-  Serial.print(" C: ");
-  Serial.print(C);
-  Serial.print(" D: ");
-  Serial.println(D);
+  // Serial.print("r: ");
+  // Serial.print(r);
+  // Serial.print(" C: ");
+  // Serial.print(C);
+  // Serial.print(" D: ");
+  // Serial.println(D);
   return theta3;
 }
 
@@ -125,13 +125,13 @@ int getTheta2again(double x, double y, double z){
   }
   double psi = acos((pow(L2,2) - pow(L1,2) - pow(w,2)) / (-2 * L1 * w));
 
-    Serial.print("r: ");
-  Serial.print(r);
-  Serial.print(" w: ");
-  Serial.print(w);
-  Serial.print(" psi: ");
-  Serial.print(psi);
-  Serial.print(" beta : ");
-  Serial.println(beta);
+  //   Serial.print("r: ");
+  // Serial.print(r);
+  // Serial.print(" w: ");
+  // Serial.print(w);
+  // Serial.print(" psi: ");
+  // Serial.print(psi);
+  // Serial.print(" beta : ");
+  // Serial.println(beta);
   return (beta + psi) * (180 / PI);
 }

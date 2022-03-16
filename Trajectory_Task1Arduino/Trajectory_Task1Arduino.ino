@@ -76,48 +76,11 @@ void setup() {
 }
 
 void loop() {
-  
+  startingPostion();
   delay(10000);
-  double x;
-  double y;
-  double z;
-
-  // move for 5 seconds
-
-  
-  for (double i = 0; i <= FinalTime; i = i + 0.1)
-  {
-    x = getTrajectoryatT(initX, finalX, i);
-    y = getTrajectoryatT(initY, finalY, i);
-    z = getTrajectoryatT(initZ, finalZ, i);
-
-    // Calculate angles
-
-    Joint1Angle = getTheta1(x,y,z); 
-    Joint2Angle = getTheta2(x,y,z); 
-    Joint3Angle = getTheta3(x,y,z); 
-
-
-    Serial.print("Joint 1: ");
-    Serial.print(Joint1Angle);
-    Serial.print(", Joint 2: ");
-    Serial.print(Joint2Angle);
-    Serial.print(", Joint 3: ");
-    Serial.print(Joint3Angle);
-
-    Serial.print("     X: ");
-    Serial.print(x);
-    Serial.print(" Y: ");
-    Serial.print(y);
-    Serial.print(" Z: ");
-    Serial.println(z);
-
-    Joint1.write(Joint1Angle+Joint1Offset);
-    Joint2.write(Joint2Angle+Joint2Offset);
-    Joint3.write(Joint3Angle+Joint3Offset);
-    Joint4.write(Joint4Angle+Joint4Offset);
-  }
-
+  doApproach();
+  delay(10000);
+  doReturn();
   delay(10000);
 }
 
@@ -179,4 +142,96 @@ double getTrajectoryatT(int initial, int final, double t){
   }
   
   return initial + (3/pow(FinalTime,2) * (final - initial) * pow(t,2)) + (2/pow(FinalTime,3) * (final-initial) * pow(t,3));
+}
+
+void doApproach(){
+  // move to position in FinalTime seconds
+  double x;
+  double y;
+  double z;
+
+  for (double i = 0; i <= FinalTime; i = i + 0.1)
+  {
+    x = getTrajectoryatT(initX, finalX, i);
+    y = getTrajectoryatT(initY, finalY, i);
+    z = getTrajectoryatT(initZ, finalZ, i);
+
+    // Calculate angles
+
+    Joint1Angle = getTheta1(x,y,z); 
+    Joint2Angle = getTheta2(x,y,z); 
+    Joint3Angle = getTheta3(x,y,z); 
+
+
+    Serial.print("Joint 1: ");
+    Serial.print(Joint1Angle);
+    Serial.print(", Joint 2: ");
+    Serial.print(Joint2Angle);
+    Serial.print(", Joint 3: ");
+    Serial.print(Joint3Angle);
+
+    Serial.print("     X: ");
+    Serial.print(x);
+    Serial.print(" Y: ");
+    Serial.print(y);
+    Serial.print(" Z: ");
+    Serial.println(z);
+
+    Joint1.write(Joint1Angle+Joint1Offset);
+    Joint2.write(Joint2Angle+Joint2Offset);
+    Joint3.write(Joint3Angle+Joint3Offset);
+    Joint4.write(Joint4Angle+Joint4Offset);
+    delay(100);
+  }
+}
+
+void doReturn(){
+  double x;
+  double y;
+  double z;
+
+  // move in FinalTime seconds
+  
+  for (double i = 0; i <= FinalTime; i = i + 0.1)
+  {
+    x = getTrajectoryatT(finalX, initX i);
+    y = getTrajectoryatT(finalY, initY, i);
+    z = getTrajectoryatT(finalZ, initZ, i);
+
+    // Calculate angles
+
+    Joint1Angle = getTheta1(x,y,z); 
+    Joint2Angle = getTheta2(x,y,z); 
+    Joint3Angle = getTheta3(x,y,z); 
+
+
+    Serial.print("Joint 1: ");
+    Serial.print(Joint1Angle);
+    Serial.print(", Joint 2: ");
+    Serial.print(Joint2Angle);
+    Serial.print(", Joint 3: ");
+    Serial.print(Joint3Angle);
+
+    Serial.print("     X: ");
+    Serial.print(x);
+    Serial.print(" Y: ");
+    Serial.print(y);
+    Serial.print(" Z: ");
+    Serial.println(z);
+
+    Joint1.write(Joint1Angle+Joint1Offset);
+    Joint2.write(Joint2Angle+Joint2Offset);
+    Joint3.write(Joint3Angle+Joint3Offset);
+    Joint4.write(Joint4Angle+Joint4Offset);
+    delay(100);
+  }
+}
+
+void startingPostion() {
+  Joint1.write(90+Joint1Offset);
+  Joint2.write(90+Joint2Offset);
+  Joint3.write(90+Joint3Offset);
+  Gripper.attach(GripperPin);
+  Joint4.write(180+Joint4Offset);
+  Gripper.write(GripperOpen); // Open gripper
 }
