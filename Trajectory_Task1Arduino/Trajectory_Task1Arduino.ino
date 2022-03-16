@@ -5,8 +5,9 @@
 #define Joint3Pin 4
 #define Joint4Pin 10
 #define GripperPin 11
-#define L1 95
-#define L2 180
+#define L1 9.5
+#define L2 18.0
+#define FinalTime 5.0
 
 // Control pins
 int Joint1ControlPin = A1;
@@ -40,12 +41,16 @@ int Joint2Offset = 39; // Your value may be different
 int Joint3Offset = 0; // Your value may be different
 int Joint4Offset = -90; // Your value may be different
 
-// Cartesian coordinates for x, y and z
 // the positve direction for x is left - to go right, change to negative sign
-double x;
-double y;
+double initX = 0.0;
+double finalX = -10.0;
+
+double initY = 18.0;
+double finalY = 5.0;
+
 // the postive direction for z is down - to go up, change to negative sign
-double z;
+double initZ = -9.5;
+double finalZ = -5.0;
 
 int Joint1AnglePrev = 90;
 int Joint2AnglePrev = 90;
@@ -71,52 +76,49 @@ void setup() {
 }
 
 void loop() {
- 
-  Joint4.write(Joint4Angle+Joint4Offset);
-
-
-  // Read Potentiometer Values
-  Joint1Control = analogRead(Joint1ControlPin);
-  Joint2Control = analogRead(Joint2ControlPin);
-  Joint3Control = analogRead(Joint3ControlPin);
   
-  // Map Analog-Digital-Converted Values into distance
-  x = map(Joint1Control,0,1023,20.0,-20.0);
-  y = map(Joint2Control,0,1023,0.0,20.0);
-  z = map(Joint3Control,0,1023,0,-20);
+  delay(10000);
+  double x;
+  double y;
+  double z;
 
-  // Calculate angles
-
-  Joint1Angle = getTheta1(x,y,z); 
-  Joint2Angle = getTheta2(x,y,z); 
-  Joint3Angle = getTheta3(x,y,z); 
-
-
-  Serial.print("Joint 1: ");
-  Serial.print(Joint1Angle);
-  Serial.print(", Joint 2: ");
-  Serial.print(Joint2Angle);
-  Serial.print(", Joint 3: ");
-  Serial.print(Joint3Angle);
-
-  Serial.print("     X: ");
-  Serial.print(x);
-  Serial.print(" Y: ");
-  Serial.print(y);
-  Serial.print(" Z: ");
-  Serial.println(z);
-
+  // move for 5 seconds
 
   
-  Joint1.write(Joint1Angle+Joint1Offset);
-  Joint2.write(Joint2Angle+Joint2Offset);
-  Joint3.write(Joint3Angle+Joint3Offset);
-  Joint4.write(Joint4Angle+Joint4Offset);
+  for (double i = 0; i <= FinalTime; i = i + 0.1)
+  {
+    x = getTrajectoryatT(initX, finalX, i);
+    y = getTrajectoryatT(initY, finalY, i);
+    z = getTrajectoryatT(initZ, finalZ, i);
 
-  
-  delay(10);
+    // Calculate angles
+
+    Joint1Angle = getTheta1(x,y,z); 
+    Joint2Angle = getTheta2(x,y,z); 
+    Joint3Angle = getTheta3(x,y,z); 
 
 
+    Serial.print("Joint 1: ");
+    Serial.print(Joint1Angle);
+    Serial.print(", Joint 2: ");
+    Serial.print(Joint2Angle);
+    Serial.print(", Joint 3: ");
+    Serial.print(Joint3Angle);
+
+    Serial.print("     X: ");
+    Serial.print(x);
+    Serial.print(" Y: ");
+    Serial.print(y);
+    Serial.print(" Z: ");
+    Serial.println(z);
+
+    Joint1.write(Joint1Angle+Joint1Offset);
+    Joint2.write(Joint2Angle+Joint2Offset);
+    Joint3.write(Joint3Angle+Joint3Offset);
+    Joint4.write(Joint4Angle+Joint4Offset);
+  }
+
+  delay(10000);
 }
 
 
@@ -148,8 +150,8 @@ int getTheta2(double x, double y, double z){
 
 int getTheta3(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));  
-  float C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
-  float D = 2*L1*L2;
+  double C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
+  double D = 2*L1*L2;
   if (!isValidAngle((acos(C/D)))){
     return Joint3AnglePrev;
   }
@@ -168,4 +170,13 @@ bool isValidAngle(double angle){
   else {
     return true;
   }
+}
+
+double getTrajectoryatT(int initial, int final, double t){
+  if (t >= FinalTime)
+  {
+    return final;
+  }
+  
+  return initial + (3/pow(FinalTime,2) * (final - initial) * pow(t,2)) + (2/pow(FinalTime,3) * (final-initial) * pow(t,3));
 }
