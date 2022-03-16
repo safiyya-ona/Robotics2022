@@ -30,10 +30,10 @@ int Joint4Offset = -90;
 // the positve direction for x is left - to go right, change to negative sign
 int x = -10;
 
-int y = 5;
+int y = 10;
 
 // the postive direction for z is down - to go up, change to negative sign
-int z = -5;
+int z = 5;
 
 double L1 =9.5;
 double L2 =18;
@@ -58,7 +58,7 @@ delay(5000); // Wait 5 seconds before going into loop()
 void loop() {
 
   int teta1 = getTheta1(x,y,z);
-  int teta2 = getTheta2again(x,y,z);
+  int teta2 = getTheta2(x,y,z);
   int teta3 = getTheta3(x,y,z);
  
   Joint4.write(Joint4Angle+Joint4Offset);
@@ -112,26 +112,4 @@ int getTheta3(double x, double y, double z){
   // Serial.print(" D: ");
   // Serial.println(D);
   return theta3;
-}
-
-int getTheta2again(double x, double y, double z){
-  double r = sqrt(pow(x,2)+pow(y,2));
-  double w = sqrt(pow(r,2)+pow(z,2));
-
-  double beta = atan2(z,r);
-  if (beta < 0)
-  {
-    beta = -1 *  beta;
-  }
-  double psi = acos((pow(L2,2) - pow(L1,2) - pow(w,2)) / (-2 * L1 * w));
-
-  //   Serial.print("r: ");
-  // Serial.print(r);
-  // Serial.print(" w: ");
-  // Serial.print(w);
-  // Serial.print(" psi: ");
-  // Serial.print(psi);
-  // Serial.print(" beta : ");
-  // Serial.println(beta);
-  return (beta + psi) * (180 / PI);
 }
