@@ -194,7 +194,7 @@ void doReturn(){
   
   for (double i = 0; i <= FinalTime; i = i + 0.1)
   {
-    x = getTrajectoryatT(finalX, initX i);
+    x = getTrajectoryatT(finalX, initX, i);
     y = getTrajectoryatT(finalY, initY, i);
     z = getTrajectoryatT(finalZ, initZ, i);
 

@@ -28,12 +28,12 @@ int Joint4Offset = -90;
 // cartesian coordinates for x, y and z
 
 // the positve direction for x is left - to go right, change to negative sign
-int x = 19;
+int x = -10;
 
-int y = 19;
+int y = 5;
 
 // the postive direction for z is down - to go up, change to negative sign
-int z = -10;
+int z = -5;
 
 double L1 =9.5;
 double L2 =18;
