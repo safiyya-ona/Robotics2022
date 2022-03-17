@@ -79,17 +79,20 @@ void setup() {
 void loop() {
   doGripper(GripperOpen);
   // go to object
-  moveTo(objectInit);
+  moveAcross(objectInit);
+  moveDown(objectInit);
   // grab the object
   doGripper(GripperClose);
-  Serial.println("back to start");
+  Serial.println("Grabbed object");
   // move to start position
   moveTo(startingPosition);
   // place object
-  moveTo(objectTarget);
+  moveAcross(objectTarget);
+  moveDown(objectTarget);
   doGripper(GripperOpen);
-  delay(10000);
+  moveDown(startingPosition);
   moveTo(startingPosition);
+  delay(10000);
 }
 
 int getTheta1(double x, double y, double z){
@@ -195,5 +198,28 @@ void moveTo( double endingPos[3]){
 
   currentX = endingPos[0];
   currentY = endingPos[1];
+  currentZ = endingPos[2];
+}
+
+void moveAcross(double endingPos[3]){
+  double x,y;
+  for (double i = 0; i < FinalTime; i = i + 0.1)
+  {
+    x = getTrajectoryatT(currentX, endingPos[0], i);
+    y = getTrajectoryatT(currentY, endingPos[1], i);
+    moveToPosition(x,y,currentZ);
+  }
+  currentX = endingPos[0];
+  currentY = endingPos[1];
+}
+
+void moveDown( double endingPos[3]){
+  double z;
+
+  for (double i = 0; i < FinalTime; i = i + 0.1)
+  {
+    z = getTrajectoryatT(currentZ, endingPos[2], i);
+    moveToPosition(currentX,currentY,z);
+  }
   currentZ = endingPos[2];
 }
