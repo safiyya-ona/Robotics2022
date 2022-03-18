@@ -5,6 +5,9 @@
 #define Joint3Pin 4
 #define Joint4Pin 10
 #define GripperPin 11
+#define L2 9.5
+#define L3 18.5
+
 // Servo Objects
 Servo Joint1;
 Servo Joint2;

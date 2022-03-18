@@ -6,20 +6,9 @@
 #define Joint4Pin 10
 #define GripperPin 11
 #define L2 9.5
-#define L3 18.0
+#define L3 18.5
 #define FinalTime 5.0
 #define RadiansToDegrees 180/PI
-
-// Control pins
-int Joint1ControlPin = A1;
-int Joint2ControlPin = A2;
-int Joint3ControlPin = A3;
-
-// Control values
-int Joint1Control = 512; // middle value between 0 and 1024
-int Joint2Control = 512; // middle value between 0 and 1024
-int Joint3Control = 512; // middle value between 0 and 1024
-
 
 // Servo Objects
 Servo Joint1;

@@ -6,7 +6,7 @@
 #define Joint4Pin 10
 #define GripperPin 11
 #define L2 9.5
-#define L3 18
+#define L3 18.5
 
 // Control pins
 int Joint1ControlPin = A1;
