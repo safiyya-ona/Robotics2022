@@ -5,9 +5,10 @@
 #define Joint3Pin 4
 #define Joint4Pin 10
 #define GripperPin 11
-#define L1 9.5
-#define L2 18.0
+#define L2 9.5
+#define L3 18.0
 #define FinalTime 5.0
+#define RadiansToDegrees 180/PI
 
 // Control pins
 int Joint1ControlPin = A1;
@@ -86,7 +87,7 @@ void loop() {
 
 
 int getTheta1(double x, double y, double z){
-  int theta1 = (atan2(y,x))*(180/PI);
+  int theta1 = (atan2(y,x))*(RadiansToDegrees);
   if (!isValidAngle(theta1))
   {
     return Joint1AnglePrev;
@@ -99,13 +100,13 @@ int getTheta1(double x, double y, double z){
 int getTheta2(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));
   double w = sqrt(pow(r,2)+pow(z,2));
-  double A = pow(L1,2)+pow(r,2)+pow(z,2)-pow(L2,2);
-  double B = 2*L1*w;
+  double A = pow(L2,2)+pow(r,2)+pow(z,2)-pow(L3,2);
+  double B = 2*L2*w;
   if (!isValidAngle(atan2(z,r)) || !isValidAngle(acos(A/B)))
   {
     return Joint2AnglePrev;
   } else {
-    int theta2 = -(atan2(z,r)-acos(A/B))*(180/PI);
+    int theta2 = (acos(A/B)-atan2(z,r)) * RadiansToDegrees;
     Joint2AnglePrev = theta2;
     return theta2;
   }
@@ -113,13 +114,13 @@ int getTheta2(double x, double y, double z){
 
 int getTheta3(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));  
-  double C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
-  double D = 2*L1*L2;
+  double C = pow(r,2)+pow(z,2)-pow(L2,2)-pow(L3,2);
+  double D = 2*L2*L3;
   if (!isValidAngle((acos(C/D)))){
     return Joint3AnglePrev;
   }
   else {
-    int theta3 = (acos(C/D)*(180/PI));
+    int theta3 = (acos(C/D)*RadiansToDegrees);
     Joint3AnglePrev = theta3;
     return theta3;
   }

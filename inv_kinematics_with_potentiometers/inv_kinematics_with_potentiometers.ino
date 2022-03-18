@@ -5,6 +5,8 @@
 #define Joint3Pin 4
 #define Joint4Pin 10
 #define GripperPin 11
+#define L2 9.5
+#define L3 18
 
 // Control pins
 int Joint1ControlPin = A1;
@@ -48,8 +50,8 @@ double y;
 // the postive direction for z is down - to go up, change to negative sign
 double z;
 
-double L1 = 9.5;
-double L2 = 18;
+double L2 = 9.5;
+double L3 = 18;
 
 int Joint1AnglePrev = 90;
 int Joint2AnglePrev = 90;
@@ -135,8 +137,8 @@ int getTheta1(double x, double y, double z){
 int getTheta2(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));
   double w = sqrt(pow(r,2)+pow(z,2));
-  double A = pow(L1,2)+pow(r,2)+pow(z,2)-pow(L2,2);
-  double B = 2*L1*w;
+  double A = pow(L2,2)+pow(r,2)+pow(z,2)-pow(L3,2);
+  double B = 2*L2*w;
   if (!isValidAngle(atan2(z,r)) || !isValidAngle(acos(A/B)))
   {
     return Joint2AnglePrev;
@@ -149,8 +151,8 @@ int getTheta2(double x, double y, double z){
 
 int getTheta3(double x, double y, double z){
   double r = sqrt(pow(x,2)+pow(y,2));  
-  float C = pow(r,2)+pow(z,2)-pow(L1,2)-pow(L2,2);
-  float D = 2*L1*L2;
+  float C = pow(r,2)+pow(z,2)-pow(L2,2)-pow(L3,2);
+  float D = 2*L2*L3;
   if (!isValidAngle((acos(C/D)))){
     return Joint3AnglePrev;
   }
